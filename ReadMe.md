@@ -45,3 +45,62 @@ https://doi.org/10.1007/s00062-021-01137-8<br/>
 <a id="3">[3]</a> Hughes, E.J., Winchman, T., Padormo, F., Teixeira, R., Wurie, J., Sharma, M., Fox, M., Hutter, J., Cordero‐Grande, L., Price, A.N., Allsop, J., Bueno‐Conde, J., Tusor, N., Arichi, T., Edwards, A.D., Rutherford, M.A., Counsell, S.J., Hajnal, J.V., 2017. A dedicated neonatal brain imaging system. Magn. Reson. Med. 78, 794–804. https://doi.org/10.1002/mrm.26462<br/>
 <a id="4">[4]</a> Makropoulos, A., Robinson, E.C., Schuh, A., Wright, R., Fitzgibbon, S., Bozek, J., Counsell, S.J., Steinweg, J., Vecchiato, K., Passerat-Palmbach, J., Lenz, G., Mortari, F., Tenev, T., Duff, E.P., Bastiani, M., Cordero-Grande, L., Hughes, E., Tusor, N., Tournier, J.-D., Hutter, J., Price, A.N., Teixeira, R.P.A.G., Murgasova, M., Victor, S., Kelly, C., Rutherford, M.A., Smith, S.M., Edwards, A.D., Hajnal, J.V., Jenkinson, M., Rueckert, D., 2018. The developing human connectome project: A minimal processing pipeline for neonatal cortical surface reconstruction. NeuroImage 173, 88–112. https://doi.org/10.1016/j.neuroimage.2018.01.054<br/>
 
+
+---
+
+
+# Notes
+
+1- Create a conda environment
+```
+conda create -n myvenv python=3.8
+conda activate myvenv
+```
+
+2- Install requirements
+```
+pip install -r requirements.txt
+```
+
+3- Resolve package conflicts
+#### resampler.py:
+- pip install nibabel==2.5.0
+- pip install dipy==1.0.0
+
+#### test_model.py:
+- pip install protobuf==3.20
+
+Overall, these messages don't indicate any issues with your script execution. However, if you're expecting GPU acceleration and encountering problems, you might need to ensure that your server is properly set up with compatible GPU drivers and libraries (CUDA). If you're running this script on a server without GPU access, these messages are normal and can be ignored.
+
+#### test_two_views.py:
+`ModuleNotFoundError: No module named 'keras'`
+
+You don't need to install the standalone keras package separately if you are using TensorFlow 2.x. Starting from TensorFlow 2.0, the high-level keras API has been integrated directly into TensorFlow as tf.keras. This means that you can access the Keras functionality directly through tf.keras without installing the standalone keras package.
+Just need to change all "from keras. ... " to "from tensorflow.keras. ... ".
+You also need to change "from keras.layers.merge import concatenate" to "from tensorflow.keras.layers import concatenate" as it couldn't import concatenate from tensorflow.keras.layers.merge
+
+4- Locate the `*.nii` in `data/test`
+
+5- Run resampler.py
+```
+resample('data/test/filename.nii', 'data/test/filename_res.nii')
+```
+
+6- Run skull_stripping.sh
+```
+chmod 755 skull_stripping.sh
+./skull_stripping.sh
+```
+
+7- Denoise the ss file (using matlab or another tool)
+
+8- Run test_two_views.py:
+- Make sure the `models` folder has `axial` and `coronal` files
+- Make sure to remove README.md files from `models` and `data` folders
+- ```python test_two_views.py```
+
+## Other useful commands:
+- ```conda info --envs``` (shows the list of conda envs)
+- ```conda list``` (run the command in the activated env to see installed conda packages)
+- ```pip list``` (shows the list of installed pip packages)
+- ```conda deactivate``` (deactivates current env)
