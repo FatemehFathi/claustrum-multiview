@@ -1,11 +1,11 @@
 import os
 os.environ['KERAS_BACKEND'] = 'tensorflow'
 import numpy as np
-from keras.models import Model
-from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, Cropping2D, ZeroPadding2D, Activation
-from keras.layers.merge import concatenate
-from keras.optimizers import Adam
-from keras import backend as K
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, Cropping2D, ZeroPadding2D, Activation
+from tensorflow.keras.layers import concatenate
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras import backend as K
 import SimpleITK as sitk
 import scipy
 from PIL import Image
@@ -200,7 +200,7 @@ pat_list = os.listdir(data_path)
 
 for pat in pat_list:
     #read data
-    pat_file_name = os.path.join(data_path, pat, pat+'_sMRI_denoised.nii.gz')
+    pat_file_name = os.path.join(data_path, pat, pat+'_T1w_denoised.nii.gz')
     ref_image = sitk.ReadImage(pat_file_name)
     image_array = sitk.GetArrayFromImage(ref_image)
     
@@ -222,11 +222,17 @@ for pat in pat_list:
      
     #this is to check the orientation of your images is right or not. Please check /images/coronal and /images/axial
     for ss in range(np.shape(corona_array)[0]):
+        slice_ = 0
+        if (np.max(corona_array[ss]) - np.min(corona_array[ss])) == 0:
+            continue
         slice_ = 255*(corona_array[ss] - np.min(corona_array[ss]))/(np.max(corona_array[ss]) - np.min(corona_array[ss]))
         im = Image.fromarray(np.uint8(slice_))
         im.save(os.path.join(image_path, direction_1, str(ss)+'.png'))
     
     for ss in range(np.shape(axial_array)[0]):
+        slice_ = 0
+        if (np.max(axial_array[ss]) - np.min(axial_array[ss])) == 0:
+            continue
         slice_ = 255*(axial_array[ss] - np.min(axial_array[ss]))/(np.max(axial_array[ss]) - np.min(axial_array[ss]))
         im = Image.fromarray(np.uint8(slice_))
         im.save(os.path.join(image_path, direction_2, str(ss)+'.png')) 
@@ -280,5 +286,3 @@ for pat in pat_list:
     sitk_image.CopyInformation(ref_image)
     filename_resultImage = os.path.join(result_path, pat, 'pred_mask.nii.gz')
     sitk.WriteImage(sitk_image, filename_resultImage )
-
-
